@@ -20,6 +20,14 @@
             <label for="image">Select an Image:</label>
             <input type="file" name="image" id="image" required>
             <br><br>
+            <label for="source">Signature Source:</label>
+            <select name="source" id="source" required>
+                <option value="">-- Select Source --</option>
+                <option value="Bank">Bank</option>
+                <option value="Legal Document">Legal Document</option>
+                <option value="Other">Other</option>
+            </select>
+            <br><br>
 
             <!-- Button to submit the form -->
             <button type="submit">Predict</button>

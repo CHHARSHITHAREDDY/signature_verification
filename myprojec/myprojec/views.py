@@ -62,6 +62,7 @@ def predict_signature(request):
         response_data = {}
         try:
             uploaded_image = request.FILES['image']
+            signature_source = request.POST.get('source')  # Capture the source field
             image = Image.open(uploaded_image)
 
             # Process and predict with BiRNN
@@ -98,6 +99,12 @@ def logout_view(request):
     logout(request)  # Logs the user out
     return redirect('index')  # Redirect to the index or login page after logout
 
+import re
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+
 # User registration view
 def registration(request):
     if request.method == 'POST':
@@ -109,6 +116,11 @@ def registration(request):
         # Validate inputs
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
+            return render(request, 'registration.html')
+
+        if not validate_password(password):
+            messages.error(request, ("Password must be 6-15 characters long, contain at least one uppercase letter, "
+                                     "one lowercase letter, one digit, and one special character."))
             return render(request, 'registration.html')
 
         if User.objects.filter(username=username).exists():
@@ -131,6 +143,7 @@ def registration(request):
 
     return render(request, 'registration.html')
 
+
 # User login view
 def login_view(request):
     if request.method == 'POST':
@@ -149,6 +162,14 @@ def login_view(request):
             return render(request, 'index.html')  # Stay on the login page
 
     return render(request, 'index.html')
+
+
+# Password validation function
+def validate_password(password):
+    # Regex for password validation
+    pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,15}$'
+    return re.match(pattern, password)
+
 
 # Upload page (requires user to be logged in)
 @login_required
